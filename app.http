@@ -1,0 +1,13 @@
+###
+POST http://localhost:3000/api/companies/register 
+Content-Type: application/json
+
+{
+    "companyName": "Tech Innovators Inc.",
+  "companySize": 50,
+  "adminEmail": "admin@techinnovators.com",
+  "adminPassword": "securePassword123",
+  "contactEmail": "contact@techinnovators.com",
+  "requirements": ["Create task"],
+  "status": "PENDING"
+}
