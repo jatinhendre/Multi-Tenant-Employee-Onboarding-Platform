@@ -112,7 +112,7 @@ export default function TasksPage() {
             required
           >
             <option>Select Employee</option>
-            {employees.map((e) => (
+            {employees.filter(e=> e.name!== "Admin").map((e) => (
               <option key={e._id} value={e.email}>
                 {e.name} ({e.email})
               </option>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectTenantDB } from "../../../../../lib/tenantDB";
-import { getEmployeeModel } from "../../../../../lib/tenantModels/employee";
+import { getEmployeeModel } from "../../../../../models/tenant/Employee";
 import { getTaskModel } from "../../../../../models/tenant/task";
 
 export async function POST(req: Request) {

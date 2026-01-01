@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import { connectTenantDB } from "../../../../../lib/tenantDB";
-import { getEmployeeModel } from "../../../../../lib/tenantModels/employee";
+import { getEmployeeModel } from "../../../../../models/tenant/Employee";
 import { User } from "../../../../../models/User";
 import { Company } from "../../../../../models/Company";
 

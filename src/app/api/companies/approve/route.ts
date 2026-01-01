@@ -4,8 +4,9 @@ import { PendingCompany } from "../../../../../models/PendingCompany";
 import { Company } from "../../../../../models/Company";
 import { connectTenantDB } from "../../../../../lib/tenantDB";
 import { User } from "../../../../../models/User";
-import { getEmployeeModel } from "../../../../../lib/tenantModels/employee";
+
 import { sendApprovalEmail } from "../../../../../lib/email";
+import { getEmployeeModel } from "../../../../../models/tenant/Employee";
 
 export async function POST(req: Request) {
   await connectDB();
