@@ -17,7 +17,7 @@ export default function EmployeesPage() {
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
     const position = (form.elements.namedItem(
       "position"
-    ) as HTMLInputElement).value;
+    ) as HTMLSelectElement).value;
 
     const res = await fetch("/api/employees/add", {
       method: "POST",
@@ -27,7 +27,7 @@ export default function EmployeesPage() {
 
     const data = await res.json();
 
-    if (res.ok) setMessage("Employee added 🎉");
+    if (res.ok) setMessage("Employee added");
     else setMessage(data.message);
   }
 
@@ -61,12 +61,18 @@ export default function EmployeesPage() {
           required
         />
 
-        <input
-          name="position"
-          placeholder="Position"
-          className="w-full border rounded px-3 py-2"
-          required
-        />
+        <select
+        name="position"
+  className="w-full border rounded px-3 py-2"
+  required
+>
+  <option value="HEAD">HEAD</option>
+  <option value="EMPLOYEE">EMPLOYEE</option>
+  <option value="COHEAD">COHEAD</option>
+  <option value="HR">HR</option>
+  <option value="MANAGER">MANAGER</option>
+</select>
+        
 
         <button className="bg-blue-600 text-white px-4 py-2 rounded">
           Add Employee

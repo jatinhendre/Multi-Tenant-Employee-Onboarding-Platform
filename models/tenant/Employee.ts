@@ -3,7 +3,7 @@ import { Connection, Schema, Model } from "mongoose";
 export interface IEmployee {
   name: string;
   email: string;
-  position: string;
+  position: "HEAD" | "EMPLOYEE" | "COHEAD" | "HR" | "MANAGER";
   status: "ACTIVE" | "INACTIVE";
   createdAt: Date;
 }

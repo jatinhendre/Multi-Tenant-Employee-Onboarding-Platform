@@ -42,20 +42,10 @@ if (!company) {
     name: pending.companyName,
     dbName,
     adminEmail: pending.adminEmail,
+    adminPassword: pending.adminPassword,
   });
 }
 
-
-  // 3️⃣ Create dedicated company DB
-  const tenantDB = await connectTenantDB(dbName);
-    // --- Create Employee model for tenant DB ---
-const Employee = getEmployeeModel(tenantDB);
-
-// --- Insert first employee (so DB gets created) ---
-await Employee.create({
-  name: "Admin",
-  email: pending.adminEmail,
-});
 
   // 4️⃣ Create admin user in platform DB
   let admin = await User.findOne({ email: pending.adminEmail });
