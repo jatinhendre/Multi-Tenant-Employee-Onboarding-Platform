@@ -7,6 +7,7 @@ import { User } from "../../../../../models/User";
 
 import { sendApprovalEmail } from "../../../../../lib/email";
 import { getEmployeeModel } from "../../../../../models/tenant/Employee";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   await connectDB();
@@ -51,15 +52,8 @@ if (!company) {
     // --- Create Employee model for tenant DB ---
 const Employee = getEmployeeModel(tenantDB);
 
-// --- Insert first employee (so DB gets created) ---
-await Employee.create({
-  name: "Admin",
-  email: pending.adminEmail,
-});
-
-  // 4️⃣ Create admin user in platform DB
+  // Create admin user in platform DB
   let admin = await User.findOne({ email: pending.adminEmail });
-
 if (!admin) {
   admin = await User.create({
     email: pending.adminEmail,

@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document, models } from "mongoose";
+import mongoose, { Schema, Document, models, ObjectId } from "mongoose";
 
 export interface ICompany extends Document {
+  id: ObjectId;
   name: string;
   dbName: string;
   adminEmail: string;

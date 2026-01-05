@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const connections: Record<string, mongoose.Connection> = {};
 
 export async function connectTenantDB(dbName: string) {
-
+  console.log(connections);
   const baseUri = process.env.MONGO_URI;
   if (!baseUri) throw new Error("MONGO_URI missing");
 

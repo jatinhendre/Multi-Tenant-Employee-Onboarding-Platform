@@ -38,7 +38,7 @@ export default function LoginPage() {
   if (data.role === "SUPERADMIN") {
   window.location.href = "/superadmin";
 } else if (data.role === "COMPANY_ADMIN") {
-  window.location.href = "/";
+  window.location.href = "/dashboard";
 } else if (data.role === "EMPLOYEE") {
   window.location.href = "/my-tasks";
 }

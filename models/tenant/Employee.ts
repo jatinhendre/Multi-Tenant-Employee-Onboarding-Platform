@@ -11,7 +11,7 @@ export interface IEmployee {
 export const EmployeeSchema = new Schema<IEmployee>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  position: { type: String, required: true },
+  position: { type: String },
   status: { type: String, enum: ["ACTIVE", "INACTIVE"], default: "ACTIVE" },
   createdAt: { type: Date, default: Date.now },
 });

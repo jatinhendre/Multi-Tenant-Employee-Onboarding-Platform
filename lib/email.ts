@@ -16,7 +16,7 @@ export async function sendApprovalEmail(to: string, companyName: string) {
   await transporter.sendMail({
     from,
     to,
-    subject: "Approval Email ",
+    subject: "Congratulations ! Your Company Successfully has been approved ",
     html: `
       <h2>Great news!</h2>
       <p>Your company <strong>${companyName}</strong> has been approved.</p>

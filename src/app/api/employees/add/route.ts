@@ -4,6 +4,7 @@ import { connectTenantDB } from "../../../../../lib/tenantDB";
 import { getEmployeeModel } from "../../../../../models/tenant/Employee";
 import { User } from "../../../../../models/User";
 import { Company } from "../../../../../models/Company";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   await connectDB();
@@ -29,9 +30,10 @@ export async function POST(req: Request) {
     email,
     position,
   });
+  const hashed = await bcrypt.hash("employee123", 10);
   await User.create({
   email,
-  password:"employee123",
+  password:hashed,
   role: "EMPLOYEE",
   company: company._id
 });

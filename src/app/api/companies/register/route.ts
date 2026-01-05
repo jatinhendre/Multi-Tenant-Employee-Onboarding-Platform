@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import { PendingCompany } from "../../../../../models/PendingCompany";
+import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   try {
@@ -29,12 +31,12 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
+    const hashed = await bcrypt.hash(adminPassword, 10);
     const company = await PendingCompany.create({
       companyName,
       companySize,
       adminEmail,
-      adminPassword,
+      adminPassword:hashed,
       contactEmail,
       requirements,
     });

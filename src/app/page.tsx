@@ -1,70 +1,31 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import DashboardLayout from "./(dashboard)/layout";
-
-export default function DashboardHome() {
-  const [role, setRole] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [company, setCompany] = useState<any>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("user");
-
-    if (!stored) {
-      window.location.href = "/login";
-      return;
-    }
-
-    const user = JSON.parse(stored);
-
-    setRole(user.role);
-    setEmail(user.email);
-    setCompany(user.company || null);
-  }, []);
-
-  if (!role) return null;
-
+export default function LandingPage() {
   return (
-    <DashboardLayout>
-      <main className="p-6">
-      {role === "COMPANY_ADMIN" && (
-        <>
-          <h1 className="text-3xl font-bold mb-2">
-            Company Admin Dashboard
-          </h1>
+    <main className="min-h-screen flex flex-col items-center justify-center text-center p-6">
+      <h1 className="text-4xl font-bold mb-4">
+        Employee SaaS Platform
+      </h1>
 
-          <div className="mt-4 border rounded p-4 bg-white shadow">
-            <p>
-              <strong>Logged in as:</strong> {email}
-            </p>
+      <p className="text-gray-600 max-w-xl mb-6">
+        A multi-tenant employee onboarding & task
+        management platform with SuperAdmin approvals
+        & secure company databases.
+      </p>
 
-            {company && (
-              <>
-                <p>
-                  <strong>Company:</strong> {company.name}
-                </p>
-                <p>
-                  <strong>DB Name:</strong> {company.dbName}
-                </p>
-                <p>
-                  <strong>Status:</strong> {company.status}
-                </p>
-              </>
-            )}
-          </div>
-        </>
-      )}
+      <div className="flex gap-4">
+        <a
+          href="/register"
+          className="bg-green-600 text-white px-5 py-2 rounded"
+        >
+          Register Company
+        </a>
 
-      {role === "SUPERADMIN" && (
-        <>
-          <h1 className="text-3xl font-bold mb-2">
-            Welcome SuperAdmin
-          </h1>
-          <p className="text-gray-700">Go to /superadmin</p>
-        </>
-      )}
+        <a
+          href="/login"
+          className="bg-blue-600 text-white px-5 py-2 rounded"
+        >
+          Login
+        </a>
+      </div>
     </main>
-    </DashboardLayout>
   );
 }
