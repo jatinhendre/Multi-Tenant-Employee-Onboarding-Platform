@@ -65,3 +65,36 @@ export async function sendApprovalEmail(to: string, companyName: string) {
     ],
   });
 }
+export async function sendWelcomeEmail(to: string, name: string, loginEmail: string, companyName: string, companyId: string) {
+  const logoPath = path.join(process.cwd(), "public", "syntask_logo.jpg");
+
+  await transporter.sendMail({
+    from,
+    to, // Yeh personal/contact email hai (Destination)
+    subject: `Action Required: Your SynTask Workspace is Ready`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden;">
+        <div style="background-color: #f8fafc; padding: 30px; text-align: center;">
+          <img src="cid:logo" style="width: 60px; border-radius: 12px;">
+          <h1 style="color: #0f172a; font-size: 24px;">Welcome to SynTask</h1>
+        </div>
+        <div style="padding: 40px 30px;">
+          <p>Hi <strong>${name}</strong>,</p>
+          <p>You have been onboarded to the <strong>${companyName}</strong> workspace. Use the credentials below to access your dashboard:</p>
+          
+          <div style="background-color: #f1f5f9; padding: 20px; border-radius: 12px; margin: 20px 0;">
+            <p style="margin: 5px 0;"><strong>Organization ID:</strong> <code style="color: #4f46e5;">${companyId}</code></p>
+            <p style="margin: 5px 0;"><strong>Login Email:</strong> ${loginEmail}</p> <p style="margin: 5px 0;"><strong>Default Password:</strong> <code style="color: #4f46e5;">employee123</code></p>
+          </div>
+
+          <p style="font-size: 13px; color: #64748b;">*Please change your password immediately after your first login for security reasons.</p>
+          
+          <div style="text-align: center; margin-top: 30px;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/login" style="background-color: #4f46e5; color: white; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: bold; display: inline-block;">Login to Dashboard</a>
+          </div>
+        </div>
+      </div>
+    `,
+    attachments: [{ filename: "logo.jpg", path: logoPath, cid: "logo" }],
+  });
+}

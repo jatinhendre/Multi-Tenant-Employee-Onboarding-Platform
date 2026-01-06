@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useCallback } from "react";
+// Import useSession to get data securely from the server context
+import { useSession } from "../../../../../components/provider/SessionProvider"; 
 
 interface TaskPayload {
   _id: string;
@@ -12,34 +13,53 @@ interface TaskPayload {
   dueDate: string;
 }
 
-interface Employee{
-  name: string,
-  email:string,
-  position: string,
-  status:string
+interface Employee {
+  _id: string; // Added _id for key
+  name: string;
+  email: string;
+  position: string;
+  status: string;
 }
+
 export default function TasksPage() {
-  const [companyDb, setCompanyDb] = useState("");
+  // ✅ FIX: Use Session Provider instead of localStorage
+  const { company } = useSession(); 
+  
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [tasks, setTasks] = useState<TaskPayload[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function loadEmployees(db: string) {
-    const res = await fetch(`/api/employees/list?db=${db}`);
-    const data = await res.json();
-    setEmployees(data.employees || []);
-  }
+  // Use useCallback to prevent infinite loops in useEffect
+  const loadEmployees = useCallback(async (db: string) => {
+    try {
+      const res = await fetch(`/api/employees/list?db=${db}`);
+      const data = await res.json();
+      setEmployees(data.employees || []);
+    } catch (e) { console.error("Err loading employees", e); }
+  }, []);
 
-  async function loadTasks(db: string) {
-    const res = await fetch(`/api/tasks/list?db=${db}`);
-    const data = await res.json();
-    setTasks(data.tasks || []);
-  }
+  const loadTasks = useCallback(async (db: string) => {
+    try {
+      const res = await fetch(`/api/tasks/list?db=${db}`);
+      const data = await res.json();
+      setTasks(data.tasks || []);
+    } catch (e) { console.error("Err loading tasks", e); }
+  }, []);
+
+  // ✅ FIX: Trigger data load when 'company' is available from Session
+  useEffect(() => {
+    if (company?.dbName) {
+      loadEmployees(company.dbName);
+      loadTasks(company.dbName);
+    }
+  }, [company, loadEmployees, loadTasks]);
 
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage("");
+    
+    if (!company?.dbName) return; // Guard clause
     setLoading(true);
 
     const form = e.currentTarget;
@@ -53,27 +73,22 @@ export default function TasksPage() {
         description: formData.get("description"),
         assignedTo: formData.get("assignedTo"),
         dueDate: formData.get("dueDate"),
-        companyDb,
+        companyDb: company.dbName, // Use dbName from context
       }),
     });
 
     if (res.ok) {
       setMessage("Task successfully assigned!");
-      loadTasks(companyDb);
+      loadTasks(company.dbName);
       form.reset();
+    } else {
+      setMessage("Failed to assign task");
     }
     setLoading(false);
   }
 
-  useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (!stored) window.location.href = "/login";
-    const user = JSON.parse(stored);
-    const db = user.company?.dbName || "";
-    setCompanyDb(db);
-    loadEmployees(db);
-    loadTasks(db);
-  }, []);
+  // Show loading state if session isn't ready yet
+  if (!company) return <div className="p-8 text-slate-400 animate-pulse">Loading workspace...</div>;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -83,14 +98,16 @@ export default function TasksPage() {
           <form onSubmit={handleCreate} className="space-y-4">
             <input name="title" placeholder="Task Title" className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" required />
             <textarea name="description" placeholder="Short description..." className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 h-24 resize-none" />
+            
             <select name="assignedTo" className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 bg-white" required>
               <option value="">Choose Employee</option>
-              {employees.filter(e => e.name !== "Admin").map((e) => (
+              {employees.map((e) => (
                 <option key={e._id} value={e.email}>{e.name} ({e.email})</option>
               ))}
             </select>
+            
             <input type="date" name="dueDate" className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
-            <button disabled={loading} className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-all shadow-lg">
+            <button disabled={loading} className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-all shadow-lg disabled:opacity-70">
               {loading ? "Creating..." : "Assign Task"}
             </button>
           </form>
@@ -108,7 +125,7 @@ export default function TasksPage() {
                 <p className="text-sm text-slate-500 line-clamp-1 mb-2">{t.description}</p>
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-slate-400">Assigned To:</span>
-                  <span className="text-xs bg-slate-100 px-2 py-0.5 rounded font-medium">{t.assignedTo}</span>
+                  <span className="text-xs bg-slate-100 px-2 py-0.5 rounded font-medium text-slate-600">{t.assignedTo}</span>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2">
@@ -119,7 +136,7 @@ export default function TasksPage() {
               </div>
             </div>
           ))}
-          {tasks.length === 0 && <p className="text-center py-20 text-slate-400 font-medium bg-white rounded-3xl border border-dashed">No tasks created yet.</p>}
+          {tasks.length === 0 && <p className="text-center py-20 text-slate-400 font-medium bg-white rounded-3xl border border-dashed">No active tasks in {company.name} database.</p>}
         </div>
       </div>
     </div>

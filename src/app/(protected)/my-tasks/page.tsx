@@ -8,7 +8,7 @@ interface TaskPayload {
   title: string;
   description: string;
   assignedTo: string;
-  status: string;
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED"; 
   dueDate: string;
 }
 
@@ -19,73 +19,111 @@ export default function MyTasksPage() {
 
   const loadMyTasks = useCallback(async () => {
     if (!company?.dbName || !user?.email) return;
+
     try {
       const res = await fetch(`/api/tasks/list?db=${company.dbName}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      
       const data = await res.json();
       const filtered = (data.tasks || []).filter((t: TaskPayload) => t.assignedTo === user.email);
       setTasks(filtered);
     } catch (error) {
-      console.error(error);
+      console.error("Sync Error:", error);
     } finally {
       setLoading(false);
     }
   }, [company?.dbName, user?.email]);
 
   useEffect(() => {
-    loadMyTasks();
-  }, [loadMyTasks]);
+    if (company && user) {
+      loadMyTasks();
+    }
+  }, [company, user, loadMyTasks]);
 
-  async function updateStatus(id: string, status: string) {
-    setTasks(prev => prev.map(t => t._id === id ? { ...t, status: status as string } : t));
-    await fetch("/api/tasks/status", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status, companyDb: company?.dbName }),
-    });
-    loadMyTasks();
+  async function updateStatus(id: string, newStatus: TaskPayload["status"]) {
+    setTasks(prev => prev.map(t => 
+      t._id === id ? { ...t, status: newStatus } : t
+    ));
+
+    try {
+      await fetch("/api/tasks/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: newStatus, companyDb: company?.dbName }),
+      });
+    } catch (error) {
+      loadMyTasks(); 
+    }
   }
 
-  if (loading) return <div className="p-8 animate-pulse text-slate-400">Syncing tasks...</div>;
-
-  return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8">
-      <div className="mb-10 flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Personal Tasks</h1>
-          <p className="text-slate-500 mt-1">Focus on your individual goals and updates</p>
-        </div>
-        <div className="h-12 w-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-indigo-200 text-white font-bold">
-           {tasks.length}
+  if (!user || !company) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-500 font-bold animate-pulse">Initializing SynTask Workspace...</p>
         </div>
       </div>
+    );
+  }
 
-      <div className="grid gap-6">
+  return (
+    <div className="max-w-5xl mx-auto p-6 md:p-10">
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter">My <span className="text-indigo-600">Tasks</span></h1>
+          <p className="text-slate-500 mt-2 text-lg font-medium">Manage your individual contributions and deadlines</p>
+        </div>
+        <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100">
+          <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Active Focus</span>
+          <span className="text-2xl font-black text-indigo-600">{tasks.filter(t => t.status !== 'COMPLETED').length}</span>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 gap-6">
         {tasks.map((t) => (
-          <div key={t._id} className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-              <div className="space-y-3">
-                <span className={`px-4 py-1 rounded-full text-[10px] font-black tracking-widest uppercase ${t.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'}`}>
-                  {t.status}
-                </span>
-                <h2 className="text-2xl font-bold text-slate-900">{t.title}</h2>
-                <p className="text-slate-600 leading-relaxed max-w-xl">{t.description}</p>
-                {t.dueDate && <p className="text-xs font-bold text-slate-400 uppercase tracking-tight italic">Deadline: {new Date(t.dueDate).toLocaleDateString()}</p>}
+          <div key={t._id} className="group bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm hover:shadow-2xl hover:border-indigo-100 transition-all duration-300">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className={`px-4 py-1 rounded-full text-[10px] font-black tracking-[0.2em] uppercase border ${
+                    t.status === 'COMPLETED' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                    t.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+                    'bg-slate-50 text-slate-500 border-slate-100'
+                  }`}>
+                    {t.status.replace("_", " ")}
+                  </span>
+                  {t.dueDate && (
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      Due: {new Date(t.dueDate).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+                
+                <h2 className="text-2xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{t.title}</h2>
+                <p className="text-slate-500 leading-relaxed text-sm md:text-base max-w-2xl">{t.description}</p>
               </div>
 
-              <div className="flex flex-col gap-3 min-w-[180px]">
-                {t.status !== "IN_PROGRESS" && t.status !== "COMPLETED" && (
-                  <button onClick={() => updateStatus(t._id, "IN_PROGRESS")} className="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition-all text-sm shadow-md">
-                    Start Working
+              <div className="flex flex-row lg:flex-col gap-3">
+                {t.status === "PENDING" && (
+                  <button 
+                    onClick={() => updateStatus(t._id, "IN_PROGRESS")} 
+                    className="flex-1 lg:w-48 bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 transition-all shadow-lg active:scale-95 text-sm"
+                  >
+                    Start Execution
                   </button>
                 )}
-                {t.status !== "COMPLETED" && (
-                  <button onClick={() => updateStatus(t._id, "COMPLETED")} className="w-full bg-emerald-500 text-white font-bold py-3 rounded-xl hover:bg-emerald-600 transition-all text-sm shadow-md shadow-emerald-100">
-                    Mark Finished
+                {t.status === "IN_PROGRESS" && (
+                  <button 
+                    onClick={() => updateStatus(t._id, "COMPLETED")} 
+                    className="flex-1 lg:w-48 bg-emerald-500 text-white font-bold py-4 rounded-2xl hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-100 active:scale-95 text-sm"
+                  >
+                    Complete Task
                   </button>
                 )}
                 {t.status === "COMPLETED" && (
-                  <div className="text-center p-3 border-2 border-dashed border-emerald-100 rounded-xl text-emerald-600 font-bold text-sm">
-                    Well Done! 🏆
+                  <div className="flex-1 lg:w-48 flex items-center justify-center gap-2 py-4 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100 font-black text-sm uppercase tracking-tighter">
+                    Verified Done 🏆
                   </div>
                 )}
               </div>
@@ -93,9 +131,11 @@ export default function MyTasksPage() {
           </div>
         ))}
 
-        {tasks.length === 0 && (
-          <div className="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-            <p className="text-slate-400 font-bold text-lg">Hooray! No pending tasks.</p>
+        {!loading && tasks.length === 0 && (
+          <div className="text-center py-24 bg-slate-50 rounded-[3rem] border-4 border-dashed border-slate-200">
+            <div className="text-6xl mb-4">✨</div>
+            <h3 className="text-xl font-bold text-slate-800">Operational Excellence</h3>
+            <p className="text-slate-400 font-medium">Your queue is currently empty. Enjoy the productivity!</p>
           </div>
         )}
       </div>

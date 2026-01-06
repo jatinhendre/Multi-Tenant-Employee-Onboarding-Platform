@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: "Overview", href: "/dashboard", icon: "📊" },
     { label: "Employees", href: "/dashboard/employees", icon: "👥", adminOnly: true },
     { label: "Team Tasks", href: "/dashboard/tasks", icon: "📁" },
-    { label: "My Personal Tasks", href: "/my-tasks", icon: "👤" },
+    { label: "Professional Network (Networx)", href: "https://networx-a-social-media-networking-p.vercel.app", icon: "🌐" },
   ];
 
   return (
