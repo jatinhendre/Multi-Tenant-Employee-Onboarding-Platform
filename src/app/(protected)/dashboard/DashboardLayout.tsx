@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "../../../../components/provider/SessionProvider";
-import Image from "next/image";
 import BrandLogo from "../../../../components/logo";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
