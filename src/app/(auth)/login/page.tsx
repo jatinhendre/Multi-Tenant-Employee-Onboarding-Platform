@@ -94,7 +94,7 @@ export default function LoginPage() {
   </div>
 
   <button className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-[0.98] transition-all mt-2">
-    Authenticate Session
+    Login
   </button>
 </form>
 

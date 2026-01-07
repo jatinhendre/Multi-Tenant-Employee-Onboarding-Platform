@@ -3,6 +3,7 @@
 import { useState } from "react";
 import BrandLogo from "../../../../components/logo";
 
+
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -45,7 +46,7 @@ export default function RegisterPage() {
             <BrandLogo size={64} className="shadow-lg" />
           </div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Deploy <span className="text-indigo-600">SynTask</span> Instance</h1>
-          <p className="text-slate-500 font-medium">Initialize your company private cloud infrastructure</p>
+          <p className="text-slate-500 font-medium">Initialize your company private infrastructure</p>
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -60,8 +61,9 @@ export default function RegisterPage() {
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-1">Industry Need</label>
             <select name="requirement" className="w-full border border-slate-300 bg-white text-slate-900 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-              <option value="TASK_ASSIGNMENT">Task Assignment</option>
-              <option value="WORKFLOW">Workflow Automation</option>
+              <option value="TASK_ASSIGNMENT">
+                Basic Package
+              </option>
             </select>
           </div>
           <div className="md:col-span-2 border-t border-slate-100 pt-5 mt-2">

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import { PendingCompany } from "../../../../../models/PendingCompany";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { cookies } from "next/headers"; 
+import { notifyToApprove } from "../../../../../lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -40,7 +41,11 @@ export async function POST(req: Request) {
       contactEmail,
       requirements,
     });
-
+    const email:string = "jatin.17776@sakec.ac.in";
+    notifyToApprove(
+      email,
+      companyName
+    )
     return NextResponse.json(
       { message: "Request submitted for approval", company },
       { status: 201 }

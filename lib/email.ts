@@ -98,3 +98,21 @@ export async function sendWelcomeEmail(to: string, name: string, loginEmail: str
     attachments: [{ filename: "logo.jpg", path: logoPath, cid: "logo" }],
   });
 }
+
+
+
+
+export async function notifyToApprove(to: string,companyName: string) {
+  
+
+  await transporter.sendMail({
+    from,
+    to, // Yeh personal/contact email hai (Destination)
+    subject: `New company for registration`,
+    html: `
+          <div style="background-color: #f1f5f9; padding: 20px; border-radius: 12px; margin: 20px 0;">
+           Approve the company ${companyName}
+          </div>
+    `
+  });
+}
