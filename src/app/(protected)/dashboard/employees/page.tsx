@@ -55,12 +55,12 @@ export default function EmployeesPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Professional ID (Login Email)</label>
+            <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Assign a Login Email)</label>
             <input name="email" type="email" placeholder="john@company.com" className="w-full border border-slate-200 bg-slate-50 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required />
           </div>
 
           <div>
-            <label className="block text-xs font-black text-indigo-500 uppercase tracking-widest mb-2 ml-1">Access Recovery (Contact Email)</label>
+            <label className="block text-xs font-black text-indigo-500 uppercase tracking-widest mb-2 ml-1">Contact Email Of Employee to send mail</label>
             <input name="contact_email" type="email" placeholder="personal.email@gmail.com" className="w-full border border-indigo-100 bg-indigo-50/30 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required />
           </div>
 
