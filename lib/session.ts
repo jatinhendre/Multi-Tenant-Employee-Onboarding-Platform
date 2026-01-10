@@ -13,14 +13,14 @@ type UserRole = "SUPERADMIN" | "COMPANY_ADMIN" | "EMPLOYEE";
 interface ISystemUser {
   _id: string;
   email: string;
-  role: UserRole; // ✅ Changed from string
+  role: UserRole;
   company?: string;
 }
 
 interface ISessionUser {
   _id: string;
   email: string;
-  role: UserRole; // ✅ Changed from string
+  role: UserRole; 
   name?: string;
 }
 
@@ -28,6 +28,7 @@ interface ISessionCompany {
   _id: string;
   name: string;
   dbName: string;
+  status:string
 }
 
 interface SessionResponse {
@@ -81,7 +82,7 @@ export async function getSessionData(): Promise<SessionResponse> {
     }
 
     return { user: null, company: null };
-  } catch (error) {
+  } catch (err) {
     return { user: null, company: null };
   }
 }

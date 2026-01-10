@@ -13,6 +13,7 @@ interface ISessionCompany {
   _id: string;
   name: string;
   dbName: string;
+  status:string
 }
 
 interface SessionContextType {
